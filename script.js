@@ -433,3 +433,23 @@ addExpenseButton.addEventListener("click", addExpense);
 addIncomeButton.addEventListener("click", addIncome);
 
 renderExpenses();
+
+// ================================
+// REGISTRAZIONE PWA
+// ================================
+
+if ("serviceWorker" in navigator) {
+
+    window.addEventListener("load", () => {
+
+        navigator.serviceWorker.register("./service-worker.js")
+            .then(() => {
+                console.log("PWA attivata correttamente");
+            })
+            .catch(error => {
+                console.error("Errore PWA:", error);
+            });
+
+    });
+
+}
