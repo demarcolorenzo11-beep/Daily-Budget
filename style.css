@@ -1,0 +1,385 @@
+
+/* =========================
+   IMPOSTAZIONI GENERALI
+========================= */
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: #17191e;
+    color: #eeeeee;
+    min-height: 100vh;
+}
+
+
+/* =========================
+   SIDEBAR
+========================= */
+
+#sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 250px;
+    height: 100vh;
+    background: #20232a;
+    border-right: 1px solid #30343d;
+    padding: 25px 15px;
+    transform: translateX(-100%);
+    transition: transform 0.25s ease;
+    z-index: 1000;
+}
+
+#sidebar.open {
+    transform: translateX(0);
+}
+
+.sidebar-title {
+    padding: 0 10px 30px;
+}
+
+.sidebar-title h1 {
+    font-size: 26px;
+    color: #ffffff;
+    letter-spacing: 1px;
+}
+
+
+/* =========================
+   MENU
+========================= */
+
+nav {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.menu-button {
+    width: 100%;
+    border: none;
+    background: transparent;
+    padding: 15px 12px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 16px;
+    color: #b9bdc8;
+    cursor: pointer;
+    text-align: left;
+    transition: background 0.2s, color 0.2s;
+}
+
+.menu-button:hover {
+    background: #30343d;
+    color: white;
+}
+
+.menu-button.active {
+    background: #303b59;
+    color: #8ba7ff;
+}
+
+
+/* =========================
+   ATTIVAZIONE SIDEBAR
+========================= */
+
+#sidebarTrigger {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 80px;
+    height: 100vh;
+    z-index: 999;
+}
+
+
+/* =========================
+   CONTENUTO PRINCIPALE
+========================= */
+
+#mainContent {
+    min-height: 100vh;
+    padding: 40px;
+    transition: margin-left 0.25s ease;
+}
+
+
+/* =========================
+   SEZIONI
+========================= */
+
+.app-section {
+    display: none;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.active-section {
+    display: block;
+}
+
+.section-header {
+    margin-bottom: 35px;
+}
+
+.section-header h2 {
+    font-size: 30px;
+    margin-bottom: 10px;
+    color: #ffffff;
+}
+
+.section-header p {
+    color: #9298a5;
+    font-size: 15px;
+}
+
+
+/* =========================
+   BOX SPESE ED ENTRATE
+========================= */
+
+.expense-form {
+    background: #20232a;
+    padding: 35px;
+    border: 1px solid #30343d;
+    border-radius: 16px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+.amount-container {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: #292d36;
+    border: 1px solid #3b414d;
+    border-radius: 12px;
+    padding: 15px 20px;
+}
+
+.amount-container span {
+    font-size: 30px;
+    color: #8ba7ff;
+    font-weight: bold;
+}
+
+.amount-container input {
+    width: 100%;
+    border: none;
+    outline: none;
+    background: transparent;
+    color: white;
+    font-size: 32px;
+    font-weight: bold;
+}
+
+.amount-container input::placeholder {
+    color: #626977;
+}
+
+.amount-container input::-webkit-inner-spin-button,
+.amount-container input::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.amount-container input[type=number] {
+    appearance: textfield;
+    -moz-appearance: textfield;
+}
+
+
+/* =========================
+   PULSANTE SPESE
+========================= */
+
+#addExpenseButton {
+    padding: 16px;
+    border: none;
+    border-radius: 10px;
+    background: #647fe0;
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+#addExpenseButton:hover {
+    background: #7892ef;
+}
+
+#addExpenseButton:active {
+    transform: scale(0.98);
+}
+
+
+/* =========================
+   BOX ENTRATE
+========================= */
+
+.income-header {
+    margin-top: 45px;
+}
+
+.income-form {
+    border-color: #315c49;
+}
+
+.income-form .amount-container {
+    border-color: #315c49;
+}
+
+.income-form .amount-container span {
+    color: #7edba0;
+}
+
+#addIncomeButton {
+    padding: 16px;
+    border: none;
+    border-radius: 10px;
+    background: #36845d;
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+#addIncomeButton:hover {
+    background: #429c70;
+}
+
+#addIncomeButton:active {
+    transform: scale(0.98);
+}
+
+
+/* =========================
+   TABELLA
+========================= */
+
+.table-container {
+    background: #20232a;
+    border: 1px solid #30343d;
+    border-radius: 15px;
+    overflow-x: auto;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 400px;
+}
+
+th,
+td {
+    padding: 18px;
+    text-align: left;
+    border-bottom: 1px solid #30343d;
+}
+
+th {
+    background: #292d36;
+    color: #aeb7c9;
+    font-size: 14px;
+}
+
+td {
+    color: #eeeeee;
+}
+
+tbody tr:hover {
+    background: #292d36;
+}
+
+tbody tr:last-child td {
+    border-bottom: none;
+}
+
+
+/* =========================
+   INDICATORE SPESA MODIFICABILE
+========================= */
+
+.expense-cell {
+    cursor: pointer;
+    color: #8299ff;
+    font-weight: 600;
+    white-space: nowrap;
+    transition: color 0.2s;
+}
+
+.expense-cell::after {
+    content: " ✎";
+    display: inline-block;
+    margin-left: 6px;
+    padding: 2px 5px;
+    border: 1px solid #647fe0;
+    border-radius: 4px;
+    font-size: 11px;
+    color: #8299ff;
+}
+
+.expense-cell:hover {
+    color: #b2c1ff;
+}
+
+
+/* =========================
+   TELEFONO
+========================= */
+
+@media (max-width: 600px) {
+
+    #sidebar {
+        width: 240px;
+    }
+
+    #mainContent {
+        padding: 30px 16px;
+    }
+
+    .section-header h2 {
+        font-size: 26px;
+    }
+
+    .expense-form {
+        padding: 20px;
+    }
+
+    .amount-container input {
+        font-size: 28px;
+    }
+
+    th,
+    td {
+        padding: 14px 12px;
+    }
+
+}
+
+/* Righe delle entrate */
+
+.income-row {
+    background-color: rgba(55, 150, 95, 0.13);
+}
+
+.income-row td {
+    color: #8bd6a5;
+}
+
+.income-row td:last-child {
+    font-weight: 600;
+}
