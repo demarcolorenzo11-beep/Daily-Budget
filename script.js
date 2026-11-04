@@ -3,14 +3,14 @@
 // 1. CONFIGURAZIONE SUPABASE
 // ========================================
 
-const SUPABASE_URL = "https://rvrewqvmehgypeyjmici.supabase.co/rest/v1/";
+const SUPABASE_URL = "https://rvrewqvmehgypeyjmici.supabase.co";
 const SUPABASE_KEY = "sb_publishable_pemngi9YBihz-Xt7pUs9dA_NShiguEh";
 
 const APP_URL = "https://demarcolorenzo11-beep.github.io/Daily-Budget/";
 
 const DAILY_BUDGET = 10;
 
-const supabase = window.supabase.createClient(
+const supabaseClient = window.supabase.createClient(
     SUPABASE_URL,
     SUPABASE_KEY
 );
@@ -64,25 +64,24 @@ let authMode = "login";
 
 let realtimeChannel = null;
 
+let legacyBudgetStartDate =
+    localStorage.getItem("budgetStartDate");
 
-// Conserviamo temporaneamente i vecchi dati
-// presenti nel browser, prima della migrazione.
+let appStarting = false;
+
+
+// Conserviamo temporaneamente i vecchi dati locali.
 
 function readLegacyData(key) {
-
     try {
         return JSON.parse(localStorage.getItem(key)) || [];
     } catch {
         return [];
     }
-
 }
 
-const legacyExpenses = readLegacyData("expenses");
-const legacyIncomes = readLegacyData("incomes");
-
-const legacyBudgetStartDate =
-    localStorage.getItem("budgetStartDate");
+let legacyExpenses = readLegacyData("expenses");
+let legacyIncomes = readLegacyData("incomes");
 
 
 // ========================================
@@ -90,7 +89,6 @@ const legacyBudgetStartDate =
 // ========================================
 
 function getToday() {
-
     const today = new Date();
 
     const year = today.getFullYear();
@@ -98,22 +96,18 @@ function getToday() {
     const day = String(today.getDate()).padStart(2, "0");
 
     return `${year}-${month}-${day}`;
-
 }
 
 
 function formatAmount(amount) {
-
     return Number(amount).toLocaleString("it-IT", {
         style: "currency",
         currency: "EUR"
     });
-
 }
 
 
 function formatDate(date) {
-
     const parts = date.split("-");
 
     const day = Number(parts[2]);
@@ -121,7 +115,6 @@ function formatDate(date) {
     const year = parts[0].slice(-2);
 
     return `${day}/${month}/${year}`;
-
 }
 
 
@@ -164,12 +157,10 @@ authSwitchButton.addEventListener("click", function() {
 
 
 function showAuthMessage(message, isError = false) {
-
     authMessage.textContent = message;
 
     authMessage.style.color =
         isError ? "#ff7777" : "#7edba0";
-
 }
 
 
@@ -189,7 +180,7 @@ authForm.addEventListener("submit", async function(event) {
 
         if (authMode === "signup") {
 
-            const { data, error } = await supabase.auth.signUp({
+            const { data, error } = await supabaseClient.auth.signUp({
 
                 email: email,
                 password: password,
@@ -218,7 +209,7 @@ authForm.addEventListener("submit", async function(event) {
 
         } else {
 
-            const { error } = await supabase.auth.signInWithPassword({
+            const { error } = await supabaseClient.auth.signInWithPassword({
 
                 email: email,
                 password: password
@@ -250,19 +241,19 @@ async function refreshTransactions() {
 
     if (!currentUser) return;
 
-    const { data, error } = await supabase
+    const { data, error } = await supabaseClient
         .from("transactions")
         .select("id, user_id, type, amount, date")
         .eq("user_id", currentUser.id);
 
     if (error) {
-
         console.error("Errore caricamento:", error);
         throw error;
-
     }
 
-    expenses = data
+    const transactions = data || [];
+
+    expenses = transactions
         .filter(item => item.type === "expense")
         .map(item => ({
             id: item.id,
@@ -270,7 +261,7 @@ async function refreshTransactions() {
             date: item.date
         }));
 
-    incomes = data
+    incomes = transactions
         .filter(item => item.type === "income")
         .map(item => ({
             id: item.id,
@@ -279,7 +270,6 @@ async function refreshTransactions() {
         }));
 
     renderExpenses();
-
 }
 
 
@@ -314,32 +304,31 @@ async function migrateOldData() {
     if (oldTransactions.length === 0) return;
 
     const confirmation = confirm(
-        `Ho trovato ${oldTransactions.length} vecchie registrazioni sul tuo dispositivo.\n\nVuoi trasferirle nel tuo account Supabase?\n\nI dati originali verranno conservati fino al completamento del trasferimento.`
+        `Ho trovato ${oldTransactions.length} vecchie registrazioni su questo dispositivo.\n\n` +
+        "Vuoi trasferirle nel tuo account?\n\n" +
+        "ATTENZIONE: conferma soltanto se questi dati appartengono a te. " +
+        "Se stai usando un dispositivo condiviso o un nuovo account, scegli Annulla."
     );
 
     if (!confirmation) return;
 
-    const { error } = await supabase
+    const { error } = await supabaseClient
         .from("transactions")
         .insert(oldTransactions);
 
     if (error) {
-
         throw new Error(
             "Trasferimento dei vecchi dati non riuscito: " + error.message
         );
-
     }
-
-    // Eliminiamo le vecchie copie locali
-    // soltanto dopo il trasferimento riuscito.
 
     localStorage.removeItem("expenses");
     localStorage.removeItem("incomes");
-    localStorage.removeItem("budgetStartDate");
+
+    legacyExpenses = [];
+    legacyIncomes = [];
 
     console.log("Migrazione completata!");
-
 }
 
 
@@ -360,12 +349,9 @@ async function setupBudgetStartDate() {
         dates[0] ||
         getToday();
 
-    // Salviamo la data iniziale nell'account.
-    // In questo modo sarà disponibile anche sugli altri dispositivi.
-
     if (!currentUser.user_metadata?.budget_start_date) {
 
-        const { data, error } = await supabase.auth.updateUser({
+        const { data, error } = await supabaseClient.auth.updateUser({
 
             data: {
                 budget_start_date: budgetStartDate
@@ -374,9 +360,14 @@ async function setupBudgetStartDate() {
         });
 
         if (error) {
+
             console.error("Errore salvataggio data iniziale:", error);
+
         } else if (data.user) {
+
             currentUser = data.user;
+            legacyBudgetStartDate = null;
+
         }
 
     }
@@ -391,13 +382,11 @@ async function setupBudgetStartDate() {
 function startRealtime() {
 
     if (realtimeChannel) {
-
-        supabase.removeChannel(realtimeChannel);
+        supabaseClient.removeChannel(realtimeChannel);
         realtimeChannel = null;
-
     }
 
-    realtimeChannel = supabase
+    realtimeChannel = supabaseClient
         .channel("transactions-" + currentUser.id)
 
         .on(
@@ -411,13 +400,9 @@ function startRealtime() {
             async function() {
 
                 try {
-
                     await refreshTransactions();
-
                 } catch (error) {
-
                     console.error("Errore sincronizzazione:", error);
-
                 }
 
             }
@@ -434,6 +419,9 @@ function startRealtime() {
 
 async function startApp(user) {
 
+    if (appStarting) return;
+
+    appStarting = true;
     currentUser = user;
 
     authScreen.hidden = true;
@@ -445,40 +433,27 @@ async function startApp(user) {
 
     try {
 
-        // Prima carichiamo i dati online.
-
-        const { data, error } = await supabase
+        const { data, error } = await supabaseClient
             .from("transactions")
             .select("id, user_id, type, amount, date")
             .eq("user_id", user.id);
 
         if (error) throw error;
 
-        const cloudIsEmpty = data.length === 0;
-
-        // Se il database è vuoto, verifichiamo
-        // se esistono ancora i vecchi dati locali.
+        const cloudIsEmpty = (data || []).length === 0;
 
         if (
             cloudIsEmpty &&
             (legacyExpenses.length > 0 || legacyIncomes.length > 0)
         ) {
-
             await migrateOldData();
-
         }
 
-        // Ricarichiamo i dati dal database.
-
         await refreshTransactions();
-
-        // Impostiamo la data iniziale del budget.
 
         await setupBudgetStartDate();
 
         renderExpenses();
-
-        // Attiviamo la sincronizzazione.
 
         startRealtime();
 
@@ -490,6 +465,10 @@ async function startApp(user) {
             "Non è stato possibile caricare i dati.\n\n" +
             error.message
         );
+
+    } finally {
+
+        appStarting = false;
 
     }
 
@@ -508,12 +487,10 @@ logoutButton.addEventListener("click", async function() {
 
     if (!confirmation) return;
 
-    const { error } = await supabase.auth.signOut();
+    const { error } = await supabaseClient.auth.signOut();
 
     if (error) {
-
         alert("Errore durante l'uscita: " + error.message);
-
     }
 
 });
@@ -523,26 +500,23 @@ logoutButton.addEventListener("click", async function() {
 // 12. GESTIONE SESSIONE
 // ========================================
 
-supabase.auth.onAuthStateChange(function(event, session) {
-
-    // Evitiamo di effettuare altre chiamate Supabase
-    // direttamente dentro questo callback.
+supabaseClient.auth.onAuthStateChange(function(event, session) {
 
     setTimeout(async function() {
 
         if (event === "SIGNED_OUT") {
 
             if (realtimeChannel) {
-
-                await supabase.removeChannel(realtimeChannel);
+                await supabaseClient.removeChannel(realtimeChannel);
                 realtimeChannel = null;
-
             }
 
             currentUser = null;
 
             expenses = [];
             incomes = [];
+
+            budgetStartDate = null;
 
             expenseTableBody.innerHTML = "";
 
@@ -553,7 +527,6 @@ supabase.auth.onAuthStateChange(function(event, session) {
             showAuthMessage("");
 
             return;
-
         }
 
         if (
@@ -678,19 +651,19 @@ menuButtons.forEach(button => {
 
 async function addExpense() {
 
+    if (!currentUser) return;
+
     const amount = Number(
         amountInput.value.replace(",", ".")
     );
 
-    if (!Number.isFinite(amount) || amount <= 0) {
-        return;
-    }
+    if (!Number.isFinite(amount) || amount <= 0) return;
 
     addExpenseButton.disabled = true;
 
     try {
 
-        const { error } = await supabase
+        const { error } = await supabaseClient
             .from("transactions")
             .insert({
 
@@ -726,19 +699,19 @@ async function addExpense() {
 
 async function addIncome() {
 
+    if (!currentUser) return;
+
     const amount = Number(
         incomeAmountInput.value.replace(",", ".")
     );
 
-    if (!Number.isFinite(amount) || amount <= 0) {
-        return;
-    }
+    if (!Number.isFinite(amount) || amount <= 0) return;
 
     addIncomeButton.disabled = true;
 
     try {
 
-        const { error } = await supabase
+        const { error } = await supabaseClient
             .from("transactions")
             .insert({
 
@@ -774,6 +747,8 @@ async function addIncome() {
 
 async function editDailyExpense(date) {
 
+    if (!currentUser) return;
+
     const dailyExpenses = expenses.filter(
         expense => expense.date === date
     );
@@ -803,10 +778,8 @@ async function editDailyExpense(date) {
     );
 
     if (!Number.isFinite(newTotal) || newTotal < 0) {
-
         alert("Inserisci un importo valido.");
         return;
-
     }
 
     try {
@@ -815,7 +788,7 @@ async function editDailyExpense(date) {
 
         if (newTotal === 0) {
 
-            const { error } = await supabase
+            const { error } = await supabaseClient
                 .from("transactions")
                 .delete()
                 .eq("user_id", currentUser.id)
@@ -825,9 +798,7 @@ async function editDailyExpense(date) {
 
         } else {
 
-            // Aggiorniamo la prima registrazione.
-
-            const { error: updateError } = await supabase
+            const { error: updateError } = await supabaseClient
                 .from("transactions")
                 .update({ amount: newTotal })
                 .eq("user_id", currentUser.id)
@@ -835,12 +806,9 @@ async function editDailyExpense(date) {
 
             if (updateError) throw updateError;
 
-            // Eliminiamo le eventuali altre registrazioni
-            // dello stesso giorno.
-
             if (ids.length > 1) {
 
-                const { error: deleteError } = await supabase
+                const { error: deleteError } = await supabaseClient
                     .from("transactions")
                     .delete()
                     .eq("user_id", currentUser.id)
