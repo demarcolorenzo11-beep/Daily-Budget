@@ -16,6 +16,135 @@ body {
     min-height: 100vh;
 }
 
+[hidden] {
+    display: none !important;
+}
+
+
+/* =========================
+   SCHERMATA ACCESSO
+========================= */
+
+.auth-screen {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.auth-box {
+    width: 100%;
+    max-width: 420px;
+    background: #20232a;
+    border: 1px solid #30343d;
+    border-radius: 16px;
+    padding: 35px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
+}
+
+.auth-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.auth-header h1 {
+    font-size: 27px;
+    color: #ffffff;
+    margin-bottom: 10px;
+}
+
+.auth-header p {
+    color: #9298a5;
+    font-size: 15px;
+}
+
+#authForm {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+#authForm label {
+    color: #b9bdc8;
+    font-size: 14px;
+    margin-top: 8px;
+}
+
+#authForm input {
+    width: 100%;
+    padding: 15px;
+    border: 1px solid #3b414d;
+    border-radius: 10px;
+    outline: none;
+    background: #292d36;
+    color: white;
+    font-size: 16px;
+}
+
+#authForm input:focus {
+    border-color: #647fe0;
+}
+
+#authForm input::placeholder {
+    color: #626977;
+}
+
+#authSubmitButton {
+    margin-top: 15px;
+    padding: 16px;
+    border: none;
+    border-radius: 10px;
+    background: #647fe0;
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+#authSubmitButton:hover {
+    background: #7892ef;
+}
+
+#authSubmitButton:disabled {
+    opacity: 0.6;
+    cursor: wait;
+}
+
+#authMessage {
+    min-height: 20px;
+    margin-top: 18px;
+    text-align: center;
+    font-size: 14px;
+    line-height: 1.5;
+    color: #7edba0;
+}
+
+.auth-switch {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px;
+    color: #9298a5;
+    font-size: 14px;
+}
+
+#authSwitchButton {
+    border: none;
+    background: transparent;
+    color: #8ba7ff;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+#authSwitchButton:hover {
+    color: #b2c1ff;
+}
+
 
 /* =========================
    SIDEBAR
@@ -33,6 +162,8 @@ body {
     transform: translateX(-100%);
     transition: transform 0.25s ease;
     z-index: 1000;
+    display: flex;
+    flex-direction: column;
 }
 
 #sidebar.open {
@@ -84,6 +215,41 @@ nav {
 .menu-button.active {
     background: #303b59;
     color: #8ba7ff;
+}
+
+
+/* =========================
+   ACCOUNT SIDEBAR
+========================= */
+
+.sidebar-account {
+    margin-top: auto;
+    padding: 15px 10px 5px;
+    border-top: 1px solid #30343d;
+}
+
+#userEmail {
+    color: #9298a5;
+    font-size: 12px;
+    overflow-wrap: anywhere;
+    margin-bottom: 12px;
+}
+
+#logoutButton {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #454b57;
+    border-radius: 9px;
+    background: #292d36;
+    color: #eeeeee;
+    font-size: 14px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+#logoutButton:hover {
+    background: #3a3035;
+    border-color: #a65d68;
 }
 
 
@@ -338,6 +504,23 @@ tbody tr:last-child td {
 
 
 /* =========================
+   RIGHE DELLE ENTRATE
+========================= */
+
+.income-row {
+    background-color: rgba(55, 150, 95, 0.13);
+}
+
+.income-row td {
+    color: #8bd6a5;
+}
+
+.income-row td:last-child {
+    font-weight: 600;
+}
+
+
+/* =========================
    TELEFONO
 ========================= */
 
@@ -368,18 +551,12 @@ tbody tr:last-child td {
         padding: 14px 12px;
     }
 
-}
+    .auth-box {
+        padding: 25px 20px;
+    }
 
-/* Righe delle entrate */
+    .auth-header h1 {
+        font-size: 24px;
+    }
 
-.income-row {
-    background-color: rgba(55, 150, 95, 0.13);
-}
-
-.income-row td {
-    color: #8bd6a5;
-}
-
-.income-row td:last-child {
-    font-weight: 600;
 }

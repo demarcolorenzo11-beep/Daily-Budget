@@ -6,7 +6,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Spese</title>
+    <title>Budget Quotidiano</title>
 
     <link rel="stylesheet" href="style.css">
     <link rel="manifest" href="manifest.json">
@@ -15,124 +15,200 @@
 
 <body>
 
-    <div id="sidebarTrigger"></div>
+    <!-- SCHERMATA DI ACCESSO -->
 
-    <aside id="sidebar">
+    <main id="authScreen" class="auth-screen">
 
-        <div class="sidebar-title">
-            <h1>SPese</h1>
+        <div class="auth-box">
+
+            <div class="auth-header">
+                <h1>Budget Quotidiano</h1>
+                <p id="authSubtitle">Accedi al tuo account</p>
+            </div>
+
+            <form id="authForm">
+
+                <label for="authEmail">Email</label>
+                <input
+                    type="email"
+                    id="authEmail"
+                    placeholder="La tua email"
+                    autocomplete="email"
+                    required
+                >
+
+                <label for="authPassword">Password</label>
+                <input
+                    type="password"
+                    id="authPassword"
+                    placeholder="La tua password"
+                    autocomplete="current-password"
+                    minlength="6"
+                    required
+                >
+
+                <button type="submit" id="authSubmitButton">
+                    Accedi
+                </button>
+
+            </form>
+
+            <p id="authMessage" role="status"></p>
+
+            <div class="auth-switch">
+                <span id="authSwitchText">Non hai un account?</span>
+                <button type="button" id="authSwitchButton">
+                    Registrati
+                </button>
+            </div>
+
         </div>
 
-        <nav>
-            <button class="menu-button active" data-section="expenseSection">
-                <span>＋</span>
-                <span>Inserisci spesa</span>
-            </button>
-
-            <button class="menu-button" data-section="tableSection">
-                <span>▤</span>
-                <span>Registro spese</span>
-            </button>
-        </nav>
-
-    </aside>
-
-
-    <main id="mainContent">
-
-        <!-- INSERIMENTO SPESA -->
-
-        <section id="expenseSection" class="app-section active-section">
-
-            <div class="section-header">
-                <h2>Nuova spesa</h2>
-                <p>Quanto hai speso oggi?</p>
-            </div>
-
-            <div class="expense-form">
-
-                <div class="amount-container">
-                    <span>€</span>
-
-                    <input
-                        type="number"
-                        id="amount"
-                        placeholder="0,00"
-                        step="0.01"
-                        min="0"
-                        inputmode="decimal"
-                    >
-                </div>
-
-                <button id="addExpenseButton">
-                    Aggiungi
-                </button>
-
-            </div>
-
-
-            <!-- INSERIMENTO ENTRATA -->
-
-            <div class="section-header income-header">
-                <h2>Nuova entrata</h2>
-                <p>Vuoi aggiungere soldi al tuo budget?</p>
-            </div>
-
-            <div class="expense-form income-form">
-
-                <div class="amount-container">
-                    <span>€</span>
-
-                    <input
-                        type="number"
-                        id="incomeAmount"
-                        placeholder="0,00"
-                        step="0.01"
-                        min="0"
-                        inputmode="decimal"
-                    >
-                </div>
-
-                <button id="addIncomeButton">
-                    Aggiungi entrata
-                </button>
-
-            </div>
-
-        </section>
-
-
-        <!-- TABELLA SPESE -->
-
-        <section id="tableSection" class="app-section">
-
-            <div class="section-header">
-                <h2>Registro spese</h2>
-                <p>Riepilogo delle tue spese giornaliere.</p>
-            </div>
-
-            <div class="table-container">
-
-                <table>
-
-                    <thead>
-                        <tr>
-                            <th>Data</th>
-                            <th>Importo</th>
-                            <th>Budget cumulativo</th>
-                        </tr>
-                    </thead>
-
-                    <tbody id="expenseTableBody">
-                    </tbody>
-
-                </table>
-
-            </div>
-
-        </section>
-
     </main>
+
+
+    <!-- APPLICAZIONE -->
+
+    <div id="appShell" hidden>
+
+        <div id="sidebarTrigger"></div>
+
+        <aside id="sidebar">
+
+            <div class="sidebar-title">
+                <h1>Budget</h1>
+            </div>
+
+            <nav>
+
+                <button class="menu-button active" data-section="expenseSection">
+                    <span>＋</span>
+                    <span>Inserisci spesa</span>
+                </button>
+
+                <button class="menu-button" data-section="tableSection">
+                    <span>▤</span>
+                    <span>Registro spese</span>
+                </button>
+
+            </nav>
+
+            <div class="sidebar-account">
+
+                <p id="userEmail"></p>
+
+                <button type="button" id="logoutButton">
+                    Esci dall'account
+                </button>
+
+            </div>
+
+        </aside>
+
+
+        <main id="mainContent">
+
+            <!-- INSERIMENTO SPESA -->
+
+            <section id="expenseSection" class="app-section active-section">
+
+                <div class="section-header">
+                    <h2>Nuova spesa</h2>
+                    <p>Quanto hai speso oggi?</p>
+                </div>
+
+                <div class="expense-form">
+
+                    <div class="amount-container">
+                        <span>€</span>
+
+                        <input
+                            type="number"
+                            id="amount"
+                            placeholder="0,00"
+                            step="0.01"
+                            min="0"
+                            inputmode="decimal"
+                        >
+                    </div>
+
+                    <button id="addExpenseButton">
+                        Aggiungi
+                    </button>
+
+                </div>
+
+
+                <!-- INSERIMENTO ENTRATA -->
+
+                <div class="section-header income-header">
+                    <h2>Nuova entrata</h2>
+                    <p>Vuoi aggiungere soldi al tuo budget?</p>
+                </div>
+
+                <div class="expense-form income-form">
+
+                    <div class="amount-container">
+                        <span>€</span>
+
+                        <input
+                            type="number"
+                            id="incomeAmount"
+                            placeholder="0,00"
+                            step="0.01"
+                            min="0"
+                            inputmode="decimal"
+                        >
+                    </div>
+
+                    <button id="addIncomeButton">
+                        Aggiungi entrata
+                    </button>
+
+                </div>
+
+            </section>
+
+
+            <!-- REGISTRO SPESE -->
+
+            <section id="tableSection" class="app-section">
+
+                <div class="section-header">
+                    <h2>Registro spese</h2>
+                    <p>Riepilogo delle tue spese giornaliere.</p>
+                </div>
+
+                <div class="table-container">
+
+                    <table>
+
+                        <thead>
+                            <tr>
+                                <th>Data</th>
+                                <th>Importo</th>
+                                <th>Budget cumulativo</th>
+                            </tr>
+                        </thead>
+
+                        <tbody id="expenseTableBody"></tbody>
+
+                    </table>
+
+                </div>
+
+            </section>
+
+        </main>
+
+    </div>
+
+
+    <!-- LIBRERIA SUPABASE -->
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <!-- CODICE APPLICAZIONE -->
 
     <script src="script.js"></script>
 
